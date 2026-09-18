@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 
 from ok import Box, ConfigOption, Icon
+from src.echo_score import DEFAULT_TEMPLATE, template_names
 from src.task.process_feature import process_feature
 
 version = "dev"
@@ -149,6 +150,24 @@ monthly_card_config_option = ConfigOption('Monthly Card Config', {
     'Monthly Card Time': 'Your computer\'s local time when the monthly card will popup, hour in (1-24)'
 })
 
+
+def validate_echo_score(key, value):
+    """Apply Echo and debug overlay switches without requiring a restart."""
+    from src.globals import Globals
+    Globals.apply_echo_score_setting_change(key, value)
+    return True, None
+
+
+echo_score_config_option = ConfigOption('声骸评分', {
+    '角色评分模板': DEFAULT_TEMPLATE,
+    '显示主副词条框体': True,
+    'Show Debug Boxes': False,
+}, description='声骸评分与游戏画面标识设置', validator=validate_echo_score,
+   config_type={
+       '角色评分模板': {'type': 'drop_down', 'options': template_names()},
+   },
+   show_at_tab=True, icon=Icon.SYNC)
+
 config = {
     'debug': False,  # Optional, default: False
     'custom_tasks': True,
@@ -158,7 +177,8 @@ config = {
     'config_folder': 'configs',
     'blur_area': blur_area,
     'gui_icon': 'icons/icon.png',
-    'global_configs': [key_config_option, char_config_option, monthly_card_config_option],
+    'global_configs': [key_config_option, echo_score_config_option, char_config_option,
+                       monthly_card_config_option],
     'custom_tabs': [["src.gui.CharacterCodeTab", "CharacterCodeTab"]],
     'ocr': {
         'lib': 'onnxocr',
@@ -270,6 +290,8 @@ config = {
         ["src.task.SkipDialogTask", "AutoDialogTask"],
         ["src.task.FastTravelTask", "FastTravelTask"],
         ["src.task.MouseResetTask", "MouseResetTask"],
+        ["src.task.OverlayStatusTask", "OverlayStatusTask"],
+        ["src.task.EchoStatOverlayTask", "EchoStatOverlayTask"],
     ], 'scene': ["src.scene.WWScene", "WWScene"],
     'update_pyappify': {
         'to_version': '1.2.3',
