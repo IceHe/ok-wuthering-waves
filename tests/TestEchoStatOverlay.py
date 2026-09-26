@@ -56,6 +56,70 @@ class TestEchoStatOverlay(unittest.TestCase):
         self.assertEqual(316, analysis.rectangles[4].tier_y)
         self.assertEqual(TIER_TEXT_COLOR, analysis.tier_colors[6])
 
+    def test_traditional_chinese_single_echo_scores_all_rows(self):
+        boxes = [
+            box(1260, 420, 90, 28, "聲骸技能"),
+            box(1270, 790, 140, 28, "莫寧裝配中"),
+            box(1260, 194, 100, 25, "共鳴效率"), box(1475, 194, 70, 25, "32.0%"),
+            box(1260, 224, 70, 25, "攻擊"), box(1495, 224, 50, 25, "100"),
+            box(1270, 255, 70, 25, "防禦"), box(1475, 255, 70, 25, "60"),
+            box(1270, 285, 100, 25, "暴擊傷害"), box(1475, 285, 70, 25, "13.8%"),
+            box(1270, 315, 100, 25, "共鳴效率"), box(1475, 315, 70, 25, "10.8%"),
+            box(1270, 345, 70, 25, "攻擊"), box(1475, 345, 70, 25, "60"),
+            box(1270, 375, 70, 25, "防禦"), box(1475, 375, 70, 25, "10.9%"),
+        ]
+
+        analysis = analyze_echo_stats(boxes, 1600, 900, "角色-通用", auto_match=True)
+
+        self.assertEqual(7, len(analysis.rectangles))
+        self.assertEqual(("", "", "3档", "2档", "6档", "4档", "4档"), analysis.tier_labels)
+        self.assertTrue(analysis.summary.startswith("评分模板：莫宁-通用 (自动匹配)\n当前评分："))
+
+    def test_traditional_chinese_tuning_page_scores_left_panel(self):
+        boxes = [
+            box(48, 42, 120, 30, "聲骸強化"),
+            box(177, 212, 76, 30, "生命"), box(478, 213, 70, 29, "22.8%"),
+            box(177, 248, 76, 28, "生命"), box(490, 250, 58, 24, "2280"),
+            box(205, 285, 87, 28, "共鳴效率"), box(475, 285, 72, 28, "10.8%"),
+            box(205, 319, 163, 28, "共鳴解放傷害加成"), box(475, 319, 72, 30, "10.1%"),
+        ]
+
+        analysis = analyze_echo_stats(boxes, 1600, 900, "角色-通用")
+
+        self.assertEqual(4, len(analysis.rectangles))
+        self.assertIn("当前评分：", analysis.summary)
+
+    def test_traditional_tuning_main_stats_with_ocr_variant_and_leading_dot(self):
+        # OCR output measured from the two reported 1600x900 screenshots.
+        # 撃 is a Japanese-shaped OCR substitute for 擊; the leading dot on
+        # .150 is an OCR artifact from the stat row, not a decimal value.
+        for first_label, first_value, second_label, second_value in (
+            ("暴擊傷害", "44.0%", "攻撃", "150"),
+            ("💥 暴撃", "22.0%", "艾攻撃", ".150"),
+        ):
+            with self.subTest(first_label=first_label):
+                boxes = [
+                    box(48, 42, 120, 30, "聲骸強化"),
+                    box(173, 210, 120, 33, first_label),
+                    box(478, 213, 74, 29, first_value),
+                    box(177, 248, 78, 30, second_label),
+                    box(493, 248, 55, 30, second_value),
+                    box(177, 285, 76, 29, "+ 暴擊"),
+                    box(475, 285, 73, 28, "7.5%"),
+                    box(203, 352, 131, 34, "共鳴效率"),
+                    box(477, 359, 68, 23, "10.0%"),
+                ]
+
+                analysis = analyze_echo_stats(boxes, 1600, 900, "角色-通用")
+
+                self.assertEqual(4, len(analysis.rectangles))
+                self.assertEqual([(255, 0, 0)] * 2,
+                                 [item.color for item in analysis.rectangles[:2]])
+                self.assertLess(analysis.rectangles[0].y, 230)
+                self.assertLess(analysis.rectangles[1].y, 280)
+                self.assertGreater(analysis.row_scores[1], 0)
+                self.assertIn("当前评分：", analysis.summary)
+
     def test_tier_colours_distinguish_lowest_and_highest_rolls(self):
         self.assertEqual(LOWEST_TIER_TEXT_COLOR, _tier_text_color((1, 8)))
         self.assertEqual(HIGHEST_TIER_TEXT_COLOR, _tier_text_color((8, 8)))

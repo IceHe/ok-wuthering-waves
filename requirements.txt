@@ -31,6 +31,8 @@ onnxocr-ppocrv5>=0.0.20
     #   echo-score (pyproject.toml)
 opencv-python==5.0.0.93
     # via echo-score (pyproject.toml)
+OpenCC==1.2.0
+    # via echo-score (pyproject.toml)
 openvino==2026.3.0
     # via echo-score (pyproject.toml)
 openvino-telemetry==2025.2.0

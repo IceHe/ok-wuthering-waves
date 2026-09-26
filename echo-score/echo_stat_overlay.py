@@ -8,8 +8,8 @@ import os
 import re
 from types import SimpleNamespace
 
-from src.echo_score import auto_match_template, calculate_echo_score, substat_tier, substat_tier_label
-from src.echo_text import simplify_echo_text
+from echo_score import auto_match_template, calculate_echo_score, substat_tier, substat_tier_label
+from echo_text import simplify_echo_text
 
 
 ECHO_STAT_PAINTER_KEY = "echo-stat-boxes"

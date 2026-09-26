@@ -7,8 +7,8 @@ from dataclasses import dataclass
 import math
 import re
 
-from src.xwuid_echo_data import TEMPLATES
-from src.echo_text import simplify_echo_text
+from xwuid_echo_data import TEMPLATES
+from echo_text import simplify_echo_text
 
 
 SCORE_PER_ECHO = 50.0

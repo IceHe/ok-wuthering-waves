@@ -36,6 +36,11 @@ class TestEchoScore(unittest.TestCase):
 
         self.assertEqual("达妮娅-通用", auto_match_template(boxes))
 
+    def test_traditional_equipped_marker_matches_character(self):
+        boxes = [SimpleNamespace(name="莫寧裝配中")]
+
+        self.assertEqual("莫宁-通用", auto_match_template(boxes))
+
     def test_all_xwuid_character_and_modal_templates_are_available(self):
         names = template_names()
 

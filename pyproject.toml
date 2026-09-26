@@ -11,5 +11,6 @@ dependencies = [
     "onnxocr-ppocrv5>=0.0.20",
     "openvino",
     "opencv-python",
+    "OpenCC>=1.2.0",
     "pyappify>=1.0.13"
 ]

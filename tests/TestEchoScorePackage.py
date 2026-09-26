@@ -18,7 +18,8 @@ class TestEchoScorePackage(unittest.TestCase):
                 "version": "9.9.9",
             }, manifest)
             for name in (
-                "echo_score.py", "xwuid_echo_data.py", "echo_stat_overlay.py",
+                "echo_score.py", "echo_text.py", "echo_capture_recovery.py",
+                "xwuid_echo_data.py", "echo_stat_overlay.py",
                 "overlay_status.py", "echo_score_settings.py", "echo_score_task.py",
             ):
                 text = (folder / name).read_text(encoding="utf-8")
@@ -34,6 +35,7 @@ class TestEchoScorePackage(unittest.TestCase):
             self.assertIn("remembered_template", worker)
             self.assertIn('set_overlay_setting("boxes", True)', worker)
             self.assertIn("overlay.set_boxes_enabled(False)", worker)
+            self.assertIn("CaptureRecoveryMonitor", worker)
 
 
 if __name__ == "__main__":
